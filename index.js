@@ -4,6 +4,8 @@ const { connection } = require("./confige/db");
 const { UserRouter } = require("./router/Userrouter");
 const multer=require('multer');
 const { Authentication } = require("./middleware/Authentication");
+const { CategoryRouter } = require("./router/Categoryrouter");
+const { productrouter } = require("./router/Productrouter");
 
 require("dotenv").config();
 const app = express();
@@ -15,7 +17,9 @@ app.use(
 
 
 app.use(express.json());
-app.use("/user",Authentication, UserRouter)
+app.use("/user", UserRouter)
+app.use("/category",CategoryRouter)
+app.use("/product",productrouter)
 
 app.get("/", (req, res) => {
   res.send("this is base api");
