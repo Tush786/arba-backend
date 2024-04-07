@@ -32,26 +32,26 @@ CategoryRouter.get("/get", async (req, res) => {
 
 CategoryRouter.post("/create", upload.single('image'), async (req, res) => {
     try {
-        const { name, slug, owner } = req.body;
-        let image = ''; // Declaring image as a let variable
-        const fileBuffer = req.file ? req.file.buffer : null;
+        const { name, slug, image,owner } = req.body;
+        // let image = ''; // Declaring image as a let variable
+        // const fileBuffer = req.file ? req.file.buffer : null;
 
-        if (fileBuffer) {
-            // Generate unique public ID
-            const timestamp = new Date().getTime();
-            const uniqueId = Math.floor(Math.random() * 100000);
-            const publicId = `image_${timestamp}_${uniqueId}`;
+        // if (fileBuffer) {
+        //     // Generate unique public ID
+        //     const timestamp = new Date().getTime();
+        //     const uniqueId = Math.floor(Math.random() * 100000);
+        //     const publicId = `image_${timestamp}_${uniqueId}`;
 
-            // Upload file from buffer to Cloudinary
-            const result = await cloudinary.uploader.upload(fileBuffer, {
-                public_id: publicId,
-                folder: "imageuploadtesting"
-            });
+        //     // Upload file from buffer to Cloudinary
+        //     const result = await cloudinary.uploader.upload(fileBuffer, {
+        //         public_id: publicId,
+        //         folder: "imageuploadtesting"
+        //     });
 
-            image = result.url;
-        }
+        //     image = result.url;
+        // }
 
-        let data = new Category_Model({ name, slug, image, owner });
+        let data = new Category_Model({ name, slug, image,owner });
         await data.save();
         res.status(201).send({ msg: "New category has been created", data: data });
     } catch (error) {

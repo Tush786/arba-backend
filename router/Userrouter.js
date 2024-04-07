@@ -58,36 +58,38 @@ UserRouter.post("/signup", upload.single('avatar'),signupValidationRules, async 
           return res.status(400).json({ errors: errors.array() });
         }
 
-      const { fullName, userName, email, password } = req.body;
-      const fileBuffer = req.file ? req.file.buffer : null; // Check if avatar is uploaded
+       const { fullName, userName, email, password,avatar } = req.body;
+      // const fileBuffer = req.file ? req.file.buffer : null; 
+      // Check if avatar is uploaded
   
     //   <-------------------Cloudinary Code For avatar upload ----------------------->
-      let profileImageUrl = '';
+      // let profileImageUrl = '';
   
       // If avatar is uploaded, upload it to Cloudinary
-      if (fileBuffer) {
-        // Generate unique public ID
-        const timestamp = new Date().getTime();
-        const uniqueId = Math.floor(Math.random()*100000);
-        const publicId = `image_${timestamp}_${uniqueId}`;
+      // if (fileBuffer) {
+      //   // Generate unique public ID
+      //   const timestamp = new Date().getTime();
+      //   const uniqueId = Math.floor(Math.random()*100000);
+      //   const publicId = `image_${timestamp}_${uniqueId}`;
   
-        // Upload file from buffer to Cloudinary
-        const result = await cloudinary.uploader.upload_stream(
-          { 
-            public_id: publicId,
-            folder: "imageuploadtesting"
-          },
-          (err, result) => {
-            if (err) throw err;
-            return result;
-          }
-        ).end(fileBuffer);
+      //   // Upload file from buffer to Cloudinary
+      //   const result = await cloudinary.uploader.upload_stream(
+      //     { 
+      //       public_id: publicId,
+      //       folder: "imageuploadtesting"
+      //     },
+      //     (err, result) => {
+      //       if (err) throw err;
+      //       return result;
+      //     }
+      //   ).end(fileBuffer);
   
-        profileImageUrl = result.url;
-      }
+      //   profileImageUrl = result.url;
+      // }
     //   <--------------------------- End Cloudinary---------------->
   
       // Check if email already exists
+      
       const userPresent = await UserModel.findOne({ email });
   
       if (userPresent) {
@@ -105,7 +107,7 @@ UserRouter.post("/signup", upload.single('avatar'),signupValidationRules, async 
             userName,
           email,
           password: hash,
-          avatar:profileImageUrl
+          avatar
         });
         await new_user.save();
         res.status(200).send({
