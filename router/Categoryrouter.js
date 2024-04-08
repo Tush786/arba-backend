@@ -23,7 +23,8 @@ cloudinary.config({
 
 CategoryRouter.get("/get", async (req, res) => {
   try {
-    const data = await Category_Model.find();
+    const {name,slug,image,owner}=req.body;
+    const data = await Category_Model.find({owner:req.body.userID});
     res.status(200).send(data);
   } catch (error) {
     res.status(500).send({ error: "Internal server error" });
@@ -33,6 +34,7 @@ CategoryRouter.get("/get", async (req, res) => {
 CategoryRouter.post("/create", upload.single('image'), async (req, res) => {
     try {
         const { name, slug, image,owner } = req.body;
+        console.log(req.body)
         // let image = ''; // Declaring image as a let variable
         // const fileBuffer = req.file ? req.file.buffer : null;
 
@@ -51,7 +53,7 @@ CategoryRouter.post("/create", upload.single('image'), async (req, res) => {
         //     image = result.url;
         // }
 
-        let data = new Category_Model({ name, slug, image,owner });
+        let data = await Category_Model({ name, slug, image,owner });
         await data.save();
         res.status(201).send({ msg: "New category has been created", data: data });
     } catch (error) {

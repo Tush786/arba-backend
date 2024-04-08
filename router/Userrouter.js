@@ -128,7 +128,7 @@ UserRouter.post("/login", async (req, res) => {
     let user_present = await UserModel.findOne({
       email,
     });
-    console.log(user_present);
+    // console.log(user_present);
     
       if (!user_present) {
         res.status(409).send("Email Does not exist!");
@@ -140,7 +140,7 @@ UserRouter.post("/login", async (req, res) => {
               { userId: user_present._id },
               process.env.SECRET_KEY
             );
-            console.log(token);
+            // console.log(token);
             res
               .status(200)
               .send({ message: "Login successfully", token, user_present });
