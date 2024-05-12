@@ -4,7 +4,7 @@ const { Product_Model } = require("../model/Productmodel");
 const { uploadOnCloudinary } = require("../utils/cloudinary");
 const fs=require('fs')
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'allimages/' });
 
 const productrouter = express.Router();
 

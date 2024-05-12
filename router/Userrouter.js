@@ -80,7 +80,7 @@ UserRouter.patch("/avatar/:id", upload.single("avatar"), async (req, res) => {
 UserRouter.post(
   "/signup",
   upload.single("avatar"),
-  signupValidationRules,
+ 
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -179,6 +179,40 @@ UserRouter.patch("/editUser/:id", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+// <======= Change Password ============>
+  
+const saltRounds = 10; // increase salt rounds for stronger hashing
+
+UserRouter.put("/changepassword/:id", async (req, res) => {
+    const userId = req.params.id;
+    const { currentPass, newPass } = req.body;
+    console.log(currentPass,newPass,userId)
+    try {
+        if (!currentPass || !newPass) {
+            return res.status(400).json({ error: "Both current password and new password are required" });
+        }
+
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const isCurrentPasswordValid = await bcrypt.compare(currentPass, user.password);
+        if (!isCurrentPasswordValid) {
+            return res.status(400).json({ error: "Current password is incorrect" });
+        }
+
+        const hashedNewPass = await bcrypt.hash(newPass, saltRounds);
+        user.password = hashedNewPass;
+        await user.save();
+        res.json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error("Error updating password:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 module.exports = {
   UserRouter,
