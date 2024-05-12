@@ -6,6 +6,7 @@ const multer=require('multer');
 const { Authentication } = require("./middleware/Authentication");
 const { CategoryRouter } = require("./router/Categoryrouter");
 const { productrouter } = require("./router/Productrouter");
+const { Cartrouter } = require("./router/Cartrouter");
 
 require("dotenv").config();
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/user", UserRouter)
 app.use("/category",Authentication,CategoryRouter)
 app.use("/product",Authentication, productrouter)
+app.use('/cart',Authentication,Cartrouter)
 
 app.get("/", (req, res) => {
   res.send("this is base api");

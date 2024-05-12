@@ -24,7 +24,7 @@ cloudinary.config({
 CategoryRouter.get("/get", async (req, res) => {
   try {
     const {name,slug,image,owner}=req.body;
-    const data = await Category_Model.find({owner:req.body.userID});
+    const data = await Category_Model.find({owner:req.body.owner});
     res.status(200).send(data);
   } catch (error) {
     res.status(500).send({ error: "Internal server error" });

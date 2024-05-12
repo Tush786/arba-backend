@@ -3,7 +3,7 @@ const Category_Schema = mongoose.Schema({
     name : {type : String,required : true},
     slug : {type : String,required : true},
     image: {type : String,required : true},
-    owner: { type: mongoose.Schema.ObjectId, ref: 'userarbas' }
+    owner: { type: mongoose.Schema.ObjectId, ref: 'userarba' }
 
 });
 

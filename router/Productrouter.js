@@ -1,34 +1,67 @@
 const express = require("express");
-
+const path = require("path");
 const { Product_Model } = require("../model/Productmodel");
+const { uploadOnCloudinary } = require("../utils/cloudinary");
+const fs=require('fs')
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 const productrouter = express.Router();
 
 productrouter.get("/get", async (req, res) => {
   try {
-    const data = await Product_Model.find();
+    const { owner } = req.body;
+    const data = await Product_Model.find({ owner: req.body.owner });
     res.status(200).send(data);
   } catch (error) {
     res.status(500).send({ error: "Internal server error" });
   }
 });
 
-productrouter.post("/create", async (req, res) => {
-  try {
-    const { title, description, price, category, image, owner } = req.body;
+productrouter.post("/create",  upload.single("image"), async (req, res) => {
+  // try {
+  //   const { title, description, price, category, image, owner } = req.body;
 
-    const data = new Product_Model({
+  //   const data = new Product_Model({
+  //     title,
+  //     description,
+  //     price,
+  //     category,
+  //     image,
+  //     owner,
+  //   });
+  //   await data.save();
+  //   res.status(201).send({ msg: "New Product has been created", data: data });
+  // } catch (error) {
+  //   res.status(400).send({ error: error.message });
+  // }
+
+  // ==================> Above code is full fuctional but i am trying image uploading with cloudinary ==========>
+
+  try {
+    const { title, description, price, category, owner } = req.body;
+    const imageLocalPath = req.file?.path;
+
+    if (!imageLocalPath) {
+      throw new Error("Image file is required");
+    }
+
+    const imagescr = await uploadOnCloudinary(imageLocalPath);
+
+    // Create new product in database
+    const newProduct = await Product_Model.create({
       title,
       description,
       price,
       category,
-      image,
+      image: imagescr.url || "", // If upload to Cloudinary failed, use an empty string as the image URL
       owner,
     });
-    await data.save();
-    res.status(201).send({ msg: "New Product has been created", data: data });
+
+    return res.status(201).json(newProduct);
   } catch (error) {
-    res.status(400).send({ error: error.message });
+    console.error("Error:", error);
+    res.status(500).send({ error: "Internal server error" });
   }
 });
 
