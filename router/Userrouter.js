@@ -79,7 +79,7 @@ UserRouter.patch("/avatar/:id", upload.single("avatar"), async (req, res) => {
 
 UserRouter.post(
   "/signup",
-  upload.single("avatar"),
+  // upload.single("avatar"),
  
   async (req, res) => {
     try {
@@ -91,13 +91,13 @@ UserRouter.post(
       const { fullName, userName, email, password} = req.body;
 
       // ==========> For Avtar
-      const avatarLocalPath = req.file?.path;
+      // const avatarLocalPath = req.file?.path;
 
-      if (!avatarLocalPath) {
-        throw new Error("Image file is required");
-      }
+      // if (!avatarLocalPath) {
+      //   throw new Error("Image file is required");
+      // }
 
-      const avatarsrc = await uploadOnCloudinary(avatarLocalPath);
+      // const avatarsrc = await uploadOnCloudinary(avatarLocalPath);
       // ================ Avatar End
 
       const userPresent = await UserModel.findOne({ email });
@@ -117,7 +117,7 @@ UserRouter.post(
           userName,
           email,
           password: hash,
-          avatar: avatarsrc.url || ""
+          // avatar: avatarsrc.url || ""
         });
         await new_user.save();
         res.status(200).send({

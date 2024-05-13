@@ -9,11 +9,11 @@ const product_Schema = mongoose.Schema({
         
       },
     image: {type : String,required : true},
-    owner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'userArba',
+    // owner: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'userArba',
      
-      }
+    //   }
 });
 
 const Product_Model = new mongoose.model("productData", product_Schema);
