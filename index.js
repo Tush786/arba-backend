@@ -7,6 +7,8 @@ const { Authentication } = require("./middleware/Authentication");
 const { CategoryRouter } = require("./router/Categoryrouter");
 const { productrouter } = require("./router/Productrouter");
 const { Cartrouter } = require("./router/Cartrouter");
+const {Forgetpassrouter} =require('./router/Forgetpassword');
+
 
 require("dotenv").config();
 const app = express();
@@ -22,6 +24,7 @@ app.use("/user", UserRouter)
 app.use("/category",Authentication,CategoryRouter)
 app.use("/product", productrouter)
 app.use('/cart',Authentication,Cartrouter)
+app.use('/pass',Forgetpassrouter)
 
 app.get("/", (req, res) => {
   res.send("this is base api");

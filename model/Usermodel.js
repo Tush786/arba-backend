@@ -8,6 +8,7 @@ const userSchema = mongoose.Schema({
     email : {type : String,required : true},
     avatar: {type : String,required : false},
     password: {type : String,required : true},
+    resetToken:{type:String,required:false},
 })
 
 const UserModel = mongoose.model("userArba",userSchema)
