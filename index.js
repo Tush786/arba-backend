@@ -22,7 +22,7 @@ app.use(
 app.use(express.json());
 app.use("/user", UserRouter)
 app.use("/category",Authentication,CategoryRouter)
-app.use("/product", productrouter)
+app.use("/product",Authentication, productrouter)
 app.use('/cart',Authentication,Cartrouter)
 app.use('/pass',Forgetpassrouter)
 

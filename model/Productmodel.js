@@ -8,12 +8,12 @@ const product_Schema = mongoose.Schema({
         ref: 'category_DataColl',
         
       },
-    image: {type : String,required : true},
-    // owner: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'userArba',
+    image: {type : String,required : false},
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'userArba',
      
-    //   }
+      }
 });
 
 const Product_Model = new mongoose.model("productData", product_Schema);

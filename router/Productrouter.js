@@ -11,7 +11,8 @@ const productrouter = express.Router();
 
 productrouter.get("/get", async (req, res) => {
   try {
-    const { sort } = req.query; // Corrected to extract 'sort' from query parameters
+    const { sort } = req.query; 
+    const { owner } = req.body;// Corrected to extract 'sort' from query parameters
 
     let sortObj = {}; // Initialize sort object
 
@@ -44,7 +45,7 @@ productrouter.post("/create",  uploadMiddleware.single("image"), async (req, res
       price,
       category,
       image,
-      // owner,
+      owner,
     });
     await data.save();
     res.status(201).send({ msg: "New Product has been created", data: data });
