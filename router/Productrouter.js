@@ -11,13 +11,28 @@ const productrouter = express.Router();
 
 productrouter.get("/get", async (req, res) => {
   try {
-    const { owner } = req.body;
-    const data = await Product_Model.find({ owner: req.body.owner });
-    res.status(200).send(data);
+    const { sort } = req.query; // Corrected to extract 'sort' from query parameters
+
+    let sortObj = {}; // Initialize sort object
+
+    // Check if 'sort' query parameter is provided and set sort criteria accordingly
+    if (sort) {
+      if (sort === 'asc') {
+        sortObj['price'] = 1;
+      } else if (sort === 'desc') {
+        sortObj['price'] = -1;
+      }
+    }
+
+    // Fetch products from database with optional sorting
+    const products = await Product_Model.find({ owner: req.body.owner }).sort(sortObj);
+
+    res.status(200).send(products); // Send sorted products
   } catch (error) {
     res.status(500).send({ error: "Internal server error" });
   }
 });
+
 
 productrouter.post("/create",  uploadMiddleware.single("image"), async (req, res) => {
   try {

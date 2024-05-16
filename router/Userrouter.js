@@ -50,12 +50,14 @@ UserRouter.patch("/avatar/:id", upload.single("avatar"), async (req, res) => {
   try {
     const userId = req.params.id;
     const avatarLocalPath = req.file?.path;
+    // console.log(avatarLocalPath)
 
     if (!avatarLocalPath) {
       return res.status(400).json({ error: "Image file is required" });
     }
 
     const avatarSrc = await uploadOnCloudinary(avatarLocalPath);
+    console.log(avatarSrc)
 
     // Update user's avatar in the database
     const updatedUser = await UserModel.findByIdAndUpdate(
@@ -77,59 +79,117 @@ UserRouter.patch("/avatar/:id", upload.single("avatar"), async (req, res) => {
   }
 });
 
-UserRouter.post(
-  "/signup",
-  // upload.single("avatar"),
- 
-  async (req, res) => {
-    try {
+// ============================================================================> Cloudinary =======================>
+// UserRouter.post(
+//   "/signup",
+//   upload.single("avatar"),
+
+//   async (req, res) => {
+//     try {
+//       const errors = validationResult(req);
+//       if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//       }
+
+//       const { fullName, userName, email, password,avatar} = req.body;
+//       console.log(avatar,fullName,userName)
+
+//       // ==========> For Avtar
+//       const avatarLocalPath = req.file?.path;
+//       // console.log(avatarLocalPath)
+
+//       if (!avatarLocalPath) {
+//         throw new Error("Image file is required");
+//       }
+
+//       const avatarsrc = await uploadOnCloudinary(avatarLocalPath);
+//       // ================ Avatar End
+
+//       const userPresent = await UserModel.findOne({ email });
+
+//       if (userPresent) {
+//         return res.status(409).send("Email already exists in database");
+//       }
+
+//       // Hash the password
+//       bcrypt.hash(password, 4, async function (err, hash) {
+//         if (err) {
+//           console.error("Error hashing password:", err);
+//           return res.status(500).send("Internal Server Error");
+//         }
+//         const new_user = await UserModel({
+//           fullName,
+//           userName,
+//           email,
+//           password: hash,
+//           avatar: avatarsrc.url || ""
+//           // avatar
+//         });
+//         console.log(avatar)
+//         await new_user.save();
+//         res.status(200).send({
+//           msg: "User Added Successfully",
+//         });
+//       });
+//     } catch (error) {
+//       console.error("Error in signup:", error);
+//       return res.status(500).send("Internal Server Error");
+//     }
+//   }
+// );
+
+
+UserRouter.post("/signup", upload.single("avatar"), async (req, res) => {
+  try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+          return res.status(400).json({ errors: errors.array() });
       }
 
-      const { fullName, userName, email, password} = req.body;
+      console.log(req.body)
+      const { fullName, userName, email, password, avatar } = req.body;
 
-      // ==========> For Avtar
-      // const avatarLocalPath = req.file?.path;
-
-      // if (!avatarLocalPath) {
-      //   throw new Error("Image file is required");
-      // }
-
-      // const avatarsrc = await uploadOnCloudinary(avatarLocalPath);
-      // ================ Avatar End
+      // Check if avatar URL is provided
+      const avatarLocalPath = req.file?.path;
+      if (!avatarLocalPath) {
+          throw new Error("Avatar URL is required");
+      }
 
       const userPresent = await UserModel.findOne({ email });
+      const avatarsrc = await uploadOnCloudinary(avatarLocalPath);
 
       if (userPresent) {
-        return res.status(409).send("Email already exists in database");
+          return res.status(409).send("Email already exists in database");
       }
 
       // Hash the password
       bcrypt.hash(password, 4, async function (err, hash) {
-        if (err) {
-          console.error("Error hashing password:", err);
-          return res.status(500).send("Internal Server Error");
-        }
-        const new_user = await UserModel({
-          fullName,
-          userName,
-          email,
-          password: hash,
-          // avatar: avatarsrc.url || ""
-        });
-        await new_user.save();
-        res.status(200).send({
-          msg: "User Added Successfully",
-        });
+          if (err) {
+              console.error("Error hashing password:", err);
+              return res.status(500).send("Internal Server Error");
+          }
+          // Create a new user instance with avatar URL
+          const new_user = await UserModel({
+              fullName,
+              userName,
+              email,
+              password: hash,
+              avatar:avatarsrc.url
+          });
+
+          await new_user.save();
+          res.status(200).send({
+              msg: "User Added Successfully",
+          });
       });
-    } catch (error) {
+  } catch (error) {
       console.error("Error in signup:", error);
       return res.status(500).send("Internal Server Error");
-    }
   }
-);
+});
+
+// ==================================== For Cloudinary Purpose ===================>
+
 
 // <-------------- Login ------------>
 UserRouter.post("/login", async (req, res) => {
@@ -181,38 +241,42 @@ UserRouter.patch("/editUser/:id", async (req, res) => {
 });
 
 // <======= Change Password ============>
-  
+
 const saltRounds = 10; // increase salt rounds for stronger hashing
 
 UserRouter.put("/changepassword/:id", async (req, res) => {
-    const userId = req.params.id;
-    const { currentPass, newPass } = req.body;
-    console.log(currentPass,newPass,userId)
-    try {
-        if (!currentPass || !newPass) {
-            return res.status(400).json({ error: "Both current password and new password are required" });
-        }
-
-        const user = await UserModel.findById(userId);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        const isCurrentPasswordValid = await bcrypt.compare(currentPass, user.password);
-        if (!isCurrentPasswordValid) {
-            return res.status(400).json({ error: "Current password is incorrect" });
-        }
-
-        const hashedNewPass = await bcrypt.hash(newPass, saltRounds);
-        user.password = hashedNewPass;
-        await user.save();
-        res.json({ message: "Password updated successfully" });
-    } catch (error) {
-        console.error("Error updating password:", error);
-        res.status(500).json({ error: "Server error" });
+  const userId = req.params.id;
+  const { currentPass, newPass } = req.body;
+  console.log(currentPass, newPass, userId);
+  try {
+    if (!currentPass || !newPass) {
+      return res
+        .status(400)
+        .json({ error: "Both current password and new password are required" });
     }
-});
 
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPass,
+      user.password
+    );
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    const hashedNewPass = await bcrypt.hash(newPass, saltRounds);
+    user.password = hashedNewPass;
+    await user.save();
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 module.exports = {
   UserRouter,
