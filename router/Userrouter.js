@@ -46,18 +46,51 @@ UserRouter.get("/:_id", async (req, res) => {
   }
 });
 
+// UserRouter.patch("/avatar/:id", upload.single("avatar"), async (req, res) => {
+//   try {
+//     const userId = req.params.id;
+//     const avatarLocalPath = req.file?.path;
+//     console.log(avatarLocalPath)
+
+//     if (!avatarLocalPath) {
+//       return res.status(400).json({ error: "Image file is required" });
+//     }
+
+//     const avatarSrc = await uploadOnCloudinary(avatarLocalPath);
+//     console.log(avatarSrc)
+
+//     // Update user's avatar in the database
+//     const updatedUser = await UserModel.findByIdAndUpdate(
+//       userId,
+//       { avatar: avatarSrc.url || "" },
+//       { new: true }
+//     );
+
+//     if (!updatedUser) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     res
+//       .status(200)
+//       .json({ message: "Avatar updated successfully", user: updatedUser });
+//   } catch (error) {
+//     console.error("Error updating avatar:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+
+
+
 UserRouter.patch("/avatar/:id", upload.single("avatar"), async (req, res) => {
   try {
     const userId = req.params.id;
     const avatarLocalPath = req.file?.path;
-    // console.log(avatarLocalPath)
 
     if (!avatarLocalPath) {
       return res.status(400).json({ error: "Image file is required" });
     }
 
     const avatarSrc = await uploadOnCloudinary(avatarLocalPath);
-    console.log(avatarSrc)
 
     // Update user's avatar in the database
     const updatedUser = await UserModel.findByIdAndUpdate(
@@ -70,14 +103,14 @@ UserRouter.patch("/avatar/:id", upload.single("avatar"), async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Avatar updated successfully", user: updatedUser });
+    res.status(200).json({ message: "Avatar updated successfully", user: updatedUser });
   } catch (error) {
     console.error("Error updating avatar:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 
 // ============================================================================> Cloudinary =======================>
 // UserRouter.post(

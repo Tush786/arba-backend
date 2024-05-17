@@ -8,59 +8,55 @@ const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
-
 const CategoryRouter = express.Router();
 
 const storage = multer.memoryStorage();
 
 const upload = multer({ storage });
 cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.API_KEY,
-    api_secret: process.env.API_SECRET_KEY,
-  });
-
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET_KEY,
+});
 
 CategoryRouter.get("/get", async (req, res) => {
   try {
-    const {name,slug,image,owner}=req.body;
-    const data = await Category_Model.find({owner:req.body.owner});
+    const { name, slug, image, owner } = req.body;
+    const data = await Category_Model.find({ owner: req.body.owner });
     res.status(200).send(data);
   } catch (error) {
     res.status(500).send({ error: "Internal server error" });
   }
 });
 
-CategoryRouter.post("/create", upload.single('image'), async (req, res) => {
-    try {
-        const { name, slug, image,owner } = req.body;
-        console.log(req.body)
-        // let image = ''; // Declaring image as a let variable
-        // const fileBuffer = req.file ? req.file.buffer : null;
+CategoryRouter.post("/create", upload.single("Cimage"), async (req, res) => {
+  try {
+    const { name, slug,  owner } = req.body;
+    console.log(req.body);
+    const imageLocalPath = req.file?.path;
 
-        // if (fileBuffer) {
-        //     // Generate unique public ID
-        //     const timestamp = new Date().getTime();
-        //     const uniqueId = Math.floor(Math.random() * 100000);
-        //     const publicId = `image_${timestamp}_${uniqueId}`;
-
-        //     // Upload file from buffer to Cloudinary
-        //     const result = await cloudinary.uploader.upload(fileBuffer, {
-        //         public_id: publicId,
-        //         folder: "imageuploadtesting"
-        //     });
-
-        //     image = result.url;
-        // }
-
-        let data = await Category_Model({ name, slug, image,owner });
-        await data.save();
-        res.status(201).send({ msg: "New category has been created", data: data });
-    } catch (error) {
-        res.status(400).send({ error: error.message });
+    console.log(imageLocalPath);
+    if (!imageLocalPath) {
+      throw new Error("Image file is required");
     }
-});
 
+    const imagescr = await uploadOnCloudinary(imageLocalPath);
+
+    // Create new product in database
+    const newProduct = new Category_Model({
+      name,
+      slug,
+      image: imagescr.url || "", // If upload to Cloudinary failed, use an empty string as the image URL
+      owner,
+    });
+    await newProduct.save();
+    res
+      .status(201)
+      .send({ msg: "New category has been created", data: newProduct });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+});
 
 CategoryRouter.patch("/update/:id", async (req, res) => {
   const { id } = req.params;

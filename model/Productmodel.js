@@ -4,13 +4,13 @@ const product_Schema = mongoose.Schema({
     description : {type : String,required : true},
     price : {type : String,required : true},
     category: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: 'category_DataColl',
         
       },
     image: {type : String,required : false},
     owner: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: 'userArba',
      
       }
