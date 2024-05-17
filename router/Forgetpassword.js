@@ -25,7 +25,7 @@ Forgetpassrouter.post("/forgotPassword", async (req, res) => {
   await user.save();
 
   // Send email with reset token
-  const resetUrl = `https://arba-latest.vercel.app/resetpassword?token=${resetToken}`;
+  const resetUrl = `https://arba-tau.vercel.app//resetpassword?token=${resetToken}`;
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
